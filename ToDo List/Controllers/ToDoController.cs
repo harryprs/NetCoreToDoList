@@ -362,8 +362,6 @@ namespace ToDo_List.Controllers
             itemToUpdate.Progress = (ProgressEnum)progress;
             itemToUpdate.ProgressString = GetProgressString(progress);
             await toDoRepo.UpdateListItem(itemToUpdate);
-            // I want to refresh the view
-            //return RedirectToAction(nameof(Index));
         }
 
         public ActionResult ShowFinishedStatus(bool showFinished)
@@ -417,7 +415,6 @@ namespace ToDo_List.Controllers
             {
                 prioritySl.Add(new SelectListItem { Text = enumValue.ToString(), Value = ((int)enumValue).ToString() });
             }
-
             return prioritySl;
         }
     }
