@@ -9,7 +9,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using ToDo_List.Helpers;
-//using Microsoft.EntityFrameworkCore;
 
 namespace ToDo_List
 {
@@ -21,7 +20,6 @@ namespace ToDo_List
             builder.Services.AddControllersWithViews();
             // Configurations are stored as a Json in appsettings.json
             var configuration = builder.Configuration;
-            
 
             // Start of Authentication
             // Don't seem to use any of this
@@ -165,15 +163,12 @@ namespace ToDo_List
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
-            /*if (!app.Environment.IsDevelopment())
+            if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
-            }*/
-            
-            app.UseDeveloperExceptionPage();
-            app.UseHsts();
+            }
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
