@@ -1,0 +1,50 @@
+﻿@model ToDo_List.Data.ListItemCreate
+
+@{
+    ViewData["Title"] = "CreateListItem";
+}
+
+<h1>Create List Item</h1>
+
+<h4>List Item</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="CreateListItem">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="ItemName" class="control-label"></label>
+                <input asp-for="ItemName" class="form-control" />
+                <span asp-validation-for="ItemName" class="text-danger"></span>
+
+                <label asp-for="ItemDescription" class="control-label"></label>
+                <input asp-for="ItemDescription" class="form-control" />
+                <span asp-validation-for="ItemDescription" class="text-danger"></span>
+
+                <label asp-for="EstimatedTime" class="control-label"></label>
+                <input asp-for="EstimatedTime" class="form-control" />
+                <span asp-validation-for="EstimatedTime" class="text-danger"></span>
+
+                <label asp-for="Priority" class="control-label"></label>
+                <select asp-for="Priority" asp-items="@ViewBag.PrioritySl" class="form-control"></select>
+                <span asp-validation-for="Priority" class="text-danger"></span>
+
+                <input asp-for="ToDoListId" type="hidden" class="form-control" value="@(ViewBag.ToDoListId)" />
+                <span asp-validation-for="ToDoListId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="CreateListItem" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

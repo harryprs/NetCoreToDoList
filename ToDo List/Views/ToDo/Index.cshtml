@@ -1,0 +1,127 @@
+﻿@model IEnumerable<ToDoList>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>ToDo Lists</h1>
+
+<p>
+    <a asp-action="Create"><input type="button" class="btn btn-primary" value="Create New List" /></a>
+</p>
+<div>
+    @foreach (var item in Model) {
+        <div class="list-border">
+        <div>
+            <h2 class="list-header">@item.Title</h2>
+            <a class="delete-icon" asp-action="Delete" asp-route-id=@item.Id></a>
+        </div>
+        <div>
+            <a class="list-header" asp-action="ListToggleIsFinished" asp-route-id=@item.Id><input type="button" class="@(item.IsFinished? "btn btn-outline-success" : "btn btn-success")" value="@(item.IsFinished? "Done" : "Mark As Done")" /></a>
+        </div>
+        <div style="@(item.IsFinished?  "display:none;" : "display:block;")">
+            <table class="list-table">
+                <thead>
+                    <tr>
+                        <th class="list-th">
+                            @Html.DisplayNameFor(model => model.ListItems.First().ItemName)
+                        </th>
+                        <th class="list-th">
+                            @Html.DisplayNameFor(model => model.ListItems.First().ItemDescription)
+                        </th>
+                        <th class="list-th">
+                            @Html.DisplayNameFor(model => model.ListItems.First().Progress)
+                        </th>
+                        <th class="list-th">
+                            @Html.DisplayNameFor(model => model.ListItems.First().Priority)
+                        </th>
+                        <th class="list-th">
+                            @Html.DisplayNameFor(model => model.ListItems.First().EstimatedTime)
+                        </th>
+                        <th class="list-th">
+                            @Html.DisplayNameFor(model => model.ListItems.First().TimeSpent)
+                        </th>
+                        <th>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var listItem in item.ListItems)
+                    {
+                        <tr>
+                            <td class="list-td">
+                                @listItem.ItemName
+                            </td>
+                            <td class="list-td">
+                                @listItem.ItemDescription
+                            </td>
+                            <td class="list-td">
+                                <select asp-for="@listItem.Progress" asp-items="@ViewBag.ProgressSl" name="@listItem.Id"></select>
+                            </td>
+                            <td class="list-td">
+                                @listItem.Priority
+                            </td>
+                            <td class="list-td">
+                                @listItem.EstimatedTime
+                            </td>
+                            <td class="list-td">
+                                @listItem.TimeSpent
+                            </td>
+                            <td>
+                                <a asp-action="EditListItem" asp-route-id=@listItem.Id>Edit</a>
+                                <a class="delete-icon" asp-action="DeleteListItem" asp-route-id=@listItem.Id></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div>
+                <a asp-action="CreateListItem" asp-route-id=@item.Id><input type="button" class="btn btn-primary" value="Add To List" /></a>
+            </div>
+        </div>
+        </div>
+    }
+</div>
+<p>
+    <a asp-action="Create"><input type="button" class="btn btn-primary" value="Create New List" /></a>
+</p>
+
+@section scripts {
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+            $(document).on('change', 'select', function(evt) {
+                var val = $(this).val();
+                $.ajax({
+                    cache:false,
+                    type: "POST",
+                    url: "@(Url.Action("UpdateProgress", "ToDo"))",
+                    data: { Id: evt.target.name, Progress: val},
+                    success: function () {
+                        location.reload(true);
+                    },
+                    error:function (xhr, ajaxOptions, thrownError){
+                    }  
+                });
+            });
+        });
+        // Intention here is to show/hide finished ToDo lists using a flag in ViewBag
+        // ViewBag is a server side variable, so changing it in Javascript(client-side) doesn't work.
+        /*$("#finishedToggle").change(function() {
+            console.log("finishedToggle start")
+            $.ajax({
+                    cache:false,
+                    type: "POST",
+                    url: "@(Url.Action("ShowFinishedStatus", "ToDo"))",
+                    data: { showFinished: '@ViewBag.showFinished'},
+                    success: function (data) {
+                        console.log(@ViewBag.showFinished);
+                    },
+                    error:function (xhr, ajaxOptions, thrownError){
+                        alert('fail');
+
+                    }  
+                });
+        });*/
+    </script>
+}

@@ -1,0 +1,70 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.list-header {
+    display: inline-block;
+}
+
+.list-border {
+    border: 1px solid black;
+    margin-bottom: 10px;
+    padding: 5px;
+}
+
+.visible-item {
+    display: block;
+    
+}
+
+.hidden-item {
+    display: none;
+}
+
+.delete-icon {
+    color: #535353;
+    font-size: 20px;
+    top: 5px;
+    cursor: pointer;
+    display: inline-block;
+    height: 25px;
+    width: 25px;
+    line-height: 22px;
+    text-align: center;
+    background-color: #ff0000;
+    border-radius: 50%;
+    text-decoration: none;
+}
+
+.delete-icon::before {
+    content: '\2715';
+    color: black;
+}
+
+.list-table {
+    table-layout: fixed;
+    width: 100%;
+    margin: 10px 0 10px 0;
+}
+
+.list-th, .list-td {
+    border: 1px solid black;
+    width: 15%;
+    overflow: hidden;
+    vertical-align: top;
+}
