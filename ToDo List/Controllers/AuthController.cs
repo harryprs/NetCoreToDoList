@@ -16,13 +16,8 @@ namespace ToDo_List.Controllers
 {
     public class AuthController : Controller
     {
-        // following this video: https://www.youtube.com/watch?v=TDY_DtTEkes&ab_channel=PatrickGod
-        // Goal is to create a controller which handles Register and Login using JWT tokens, including creating and refreshing tokens
-
         private readonly ToDoDbContext _context;
-        //public static User user = new User();
         private readonly IConfiguration _configuration;
-        //private readonly IUserService _userService;
 
         public AuthController(ToDoDbContext context, IConfiguration configuration)
         {
@@ -40,13 +35,16 @@ namespace ToDo_List.Controllers
         [HttpPost]
         public async Task<ActionResult<UserLogin>> Register(UserDto request)
         {
-            // provide with dummy data to test, hardcoding for testing purposes
-            // request.Username = "harryprs";
-            // request.Password = "admin123";
+            var existingUser = await _context.User.Where(x => x.Username == request.Username).FirstOrDefaultAsync();
+            // User with that username already exists
+            if(existingUser != null)
+            {
+                return View(request);
+            }
+
             // passwordSalt - a random piece of data added to the password before running it through the password hashing algorithm, make it more secure
             // passwordHash - an algorithm which morphs the password into a new string
             CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
-            //stores the passwordHash
             UserLogin user = new UserLogin();
             user.Username = request.Username;
             user.PasswordHash = passwordHash;
