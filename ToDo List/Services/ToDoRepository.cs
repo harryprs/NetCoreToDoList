@@ -14,7 +14,7 @@ namespace ToDo_List.Services
             _context = context;
         }
 
-        public async Task<List<ToDoList>> GetAllToDoListsByUserId(int userId)
+        public async Task<List<ToDoList>> GetAllToDoListsByUserId(int? userId)
         {
             return await _context.ToDoList
                                           .Where(i => i.UserId == userId)

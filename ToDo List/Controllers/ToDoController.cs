@@ -38,55 +38,14 @@ namespace ToDo_List.Controllers
             // jwtToken = this.context.request.Headers["jwt"]
             // refreshToken = this.context.request.Headers["refreshToken"]
             // We need to pull that token, read it and grab the claims. This will happen before routing - is it a setting in Program.cs?
-
-            var userId = Int32.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userId = GetUserIdFromClaims();
+            if (userId == 0)
+            {
+                return NotFound();
+            }
             var toDoLists = await toDoRepo.GetAllToDoListsByUserId(userId);
 
-            /*//ProgressString is going to be saved in our db, we're just using enum to control what writes to it
-            foreach(var toDoList in toDoLists)
-            {
-                foreach(var item in toDoList.ListItems)
-                {
-                    item.ProgressString = 
-                }
-            }
-            */
-
-            // Used to toggle show/hide feature of lists - ViewBag is a server-side variable, changing showFinished client-side doesn't work.
-            ViewBag.showFinished = false;
-
-            //List<int>  = new List<int>() { 0, 25, 50, 75, 100 };
-            /*ddl.Add(0);
-            ddl.Add(25);
-            ddl.Add(50);
-            ddl.Add(75);
-            ddl.Add(100);*/
-            //ViewBag.ddl = ddl;
             ViewBag.ProgressSl = GetProgressSelectList();
-            // I don't like this option, because it requires changing Progress on all listitems into a SelectList which seems could be a lot.
-            //List<ToDoListIndex> toDoListsIndex = new List<ToDoListIndex>();
-            /*foreach(ToDoList list in toDoLists)
-            {
-                toDoListsIndex.Add(new ToDoListIndex()
-                {
-                    Id = list.Id,
-                    Title = list.Title,
-                    IsFinished = list.IsFinished,
-                    ListItems = list.ListItems.Select(li =>
-                    {
-                        new ListItemIndex()
-                        {
-                            Id = li.Id,
-                            EstimatedTime = li.EstimatedTime
-                        };
-                    }).ToList()
-                });
-            }*/
-
-            /*foreach(SelectListItem item in ddl)
-            {
-                
-            }*/
             return View(toDoLists);
         }
 
@@ -119,8 +78,12 @@ namespace ToDo_List.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Title")] ToDoList toDoList)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            toDoList.UserId = Int32.Parse(userId);
+            var userId = GetUserIdFromClaims();
+            if(userId == 0)
+            {
+                return NotFound();
+            }
+            toDoList.UserId = userId;
             toDoList.IsFinished = false;
             if (ModelState.IsValid)
             {
@@ -131,8 +94,12 @@ namespace ToDo_List.Controllers
         }
 
         // GET: ToDo/CreateListItem
-        public IActionResult CreateListItem(string id)
+        public async Task<IActionResult> CreateListItem(string id)
         {
+            if(!await ValidateUserOwnsToDoList(Int32.Parse(id)))
+            {
+                return NotFound();
+            }
             ViewBag.ToDoListId = id;
             ViewBag.PrioritySl = GetPrioritySelectList();
             return View();
@@ -143,7 +110,11 @@ namespace ToDo_List.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateListItem([Bind("ItemName,ItemDescription,EstimatedTime,Priority,ToDoListId")] ListItemCreate listItemCreate)
         {
-            // Move this into repo CreateListItem?
+            if (!await ValidateUserOwnsToDoList(listItemCreate.ToDoListId))
+            {
+                return NotFound();
+            }
+            
             ListItem listItem = new ListItem()
             {
                 Progress = (ProgressEnum)1,
@@ -165,14 +136,16 @@ namespace ToDo_List.Controllers
         }
 
         // GET: ToDo/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null || _context.ToDoList == null)
+            if (id == 0 || _context.ToDoList == null)
             {
                 return NotFound();
             }
+
             var toDoList = await toDoRepo.GetToDoListByToDoListId(id);
-            if (toDoList == null)
+            int userId = GetUserIdFromClaims();
+            if (userId == 0 || toDoList.UserId != userId)
             {
                 return NotFound();
             }
@@ -185,7 +158,11 @@ namespace ToDo_List.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title")] ToDoList toDoList)
         {
-            //start of scaffolded code
+            if (!await ValidateUserOwnsToDoList(id))
+            {
+                return NotFound();
+            }
+
             if (id != toDoList.Id)
             {
                 return NotFound();
@@ -220,8 +197,14 @@ namespace ToDo_List.Controllers
             {
                 return NotFound();
             }
+
             var listItem = await toDoRepo.GetListItemByListItemId(id);
             if (listItem == null)
+            {
+                return NotFound();
+            }
+
+            if (!await ValidateUserOwnsToDoList(listItem.ToDoListId))
             {
                 return NotFound();
             }
@@ -238,7 +221,12 @@ namespace ToDo_List.Controllers
         public async Task<IActionResult> EditListItem(int id, [Bind("Id,ItemName,ItemDescription,Progress,EstimatedTime,TimeSpent,Priority,ToDoListId")] ListItem listItem)
         {
             listItem.ProgressString = GetProgressString((int)listItem.Progress);
-            //start of scaffolded codes
+
+            if (!await ValidateUserOwnsToDoList(listItem.ToDoListId))
+            {
+                return NotFound();
+            }
+
             if (id != listItem.Id)
             {
                 return NotFound();
@@ -267,13 +255,20 @@ namespace ToDo_List.Controllers
         }
 
          // GET: ToDo/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null || _context.ToDoList == null)
+            if (id == 0 || _context.ToDoList == null)
             {
                 return NotFound();
             }
+
             var toDoList = await toDoRepo.GetToDoListByToDoListId(id);
+            int userId = GetUserIdFromClaims();
+            if (userId == 0 || toDoList.UserId != userId)
+            {
+                return NotFound();
+            }
+
             if (toDoList == null)
             {
                 return NotFound();
@@ -292,23 +287,34 @@ namespace ToDo_List.Controllers
                 return Problem("Entity set 'ToDoDbContext.ToDoList'  is null.");
             }
             var toDoList = await toDoRepo.GetToDoListByToDoListId(id);
+            int userId = GetUserIdFromClaims();
+            if (userId == 0 || toDoList.UserId != userId)
+            {
+                return NotFound();
+            }
+
             if (toDoList != null)
             {
                 await toDoRepo.DeleteList(toDoList);
-                // Will this also crawl through and delete list items using our navigation properties?
             }
             
             return RedirectToAction(nameof(Index));
         }
 
         // GET: ToDo/DeleteListItem/5
-        public async Task<IActionResult> DeleteListItem(int? id)
+        public async Task<IActionResult> DeleteListItem(int id)
         {
-            if (id == null || _context.ListItem == null)
+            if (id == 0 || _context.ListItem == null)
             {
                 return NotFound();
             }
             var listItem = await toDoRepo.GetListItemByListItemId(id);
+
+            if (!await ValidateUserOwnsToDoList(listItem.ToDoListId))
+            {
+                return NotFound();
+            }
+
             if (listItem == null)
             {
                 return NotFound();
@@ -327,6 +333,12 @@ namespace ToDo_List.Controllers
                 return Problem("Entity set 'ToDoDbContext.ListItem'  is null.");
             }
             var listItem = await toDoRepo.GetListItemByListItemId(id);
+
+            if (!await ValidateUserOwnsToDoList(listItem.ToDoListId))
+            {
+                return NotFound();
+            }
+
             if (listItem != null)
             {
                 await toDoRepo.DeleteListItem(listItem);
@@ -337,12 +349,14 @@ namespace ToDo_List.Controllers
 
         public async Task<IActionResult> ListToggleIsFinished(int id)
         {
-            if (id == null || _context.ListItem == null)
+            if (id == 0 || _context.ListItem == null)
             {
                 return NotFound();
             }
+
+            int userId = GetUserIdFromClaims();
             var toDoList = await toDoRepo.GetToDoListByToDoListId(id);
-            if(toDoList != null)
+            if(toDoList != null && userId == toDoList.UserId)
             {
                 toDoList.IsFinished = !toDoList.IsFinished;
                 await toDoRepo.UpdateList(toDoList);
@@ -353,12 +367,16 @@ namespace ToDo_List.Controllers
 
         private bool ToDoListExists(int id)
         {
-          return (_context.ToDoList?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.ToDoList?.Any(e => e.Id == id)).GetValueOrDefault();
         }
 
         public async Task UpdateProgress(int id, int progress)
         {
             ListItem itemToUpdate = await toDoRepo.GetListItemByListItemId(id);
+            if (!await ValidateUserOwnsToDoList(itemToUpdate.ToDoListId))
+            {
+                return;
+            }
             itemToUpdate.Progress = (ProgressEnum)progress;
             itemToUpdate.ProgressString = GetProgressString(progress);
             await toDoRepo.UpdateListItem(itemToUpdate);
@@ -416,6 +434,22 @@ namespace ToDo_List.Controllers
                 prioritySl.Add(new SelectListItem { Text = enumValue.ToString(), Value = ((int)enumValue).ToString() });
             }
             return prioritySl;
+        }
+
+        public int GetUserIdFromClaims()
+        {
+            return Int32.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        }
+
+        public async Task<bool> ValidateUserOwnsToDoList(int toDoListId)
+        {
+            int userId = GetUserIdFromClaims();
+            var toDoList = await toDoRepo.GetToDoListByToDoListId(toDoListId);
+            if (toDoList == null || userId == 0 || toDoList.UserId != userId)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }
