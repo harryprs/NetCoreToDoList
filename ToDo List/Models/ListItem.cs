@@ -18,7 +18,6 @@ namespace ToDo_List.Models
         [Required]
         [Range(1, 3)]
         public ProgressEnum Progress { get; set; }
-        public string ProgressString { get; set; }
         [Display(Name = "Estimated Time(mins)")]
         public int? EstimatedTime { get; set; }
         [Display(Name = "Time Spent(mins)")]

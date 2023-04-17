@@ -118,7 +118,6 @@ namespace ToDo_List.Controllers
             ListItem listItem = new ListItem()
             {
                 Progress = (ProgressEnum)1,
-                ProgressString = "Not Started",
                 ItemName = listItemCreate.ItemName,
                 ItemDescription = listItemCreate.ItemDescription,
                 EstimatedTime = listItemCreate.EstimatedTime,
@@ -220,8 +219,6 @@ namespace ToDo_List.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditListItem(int id, [Bind("Id,ItemName,ItemDescription,Progress,EstimatedTime,TimeSpent,Priority,ToDoListId")] ListItem listItem)
         {
-            listItem.ProgressString = GetProgressString((int)listItem.Progress);
-
             if (!await ValidateUserOwnsToDoList(listItem.ToDoListId))
             {
                 return NotFound();
@@ -378,7 +375,6 @@ namespace ToDo_List.Controllers
                 return;
             }
             itemToUpdate.Progress = (ProgressEnum)progress;
-            itemToUpdate.ProgressString = GetProgressString(progress);
             await toDoRepo.UpdateListItem(itemToUpdate);
         }
 
@@ -386,21 +382,6 @@ namespace ToDo_List.Controllers
         {
             ViewBag.showFinished = !showFinished;
             return new EmptyResult();
-        }
-
-        public string GetProgressString(int progress)
-        {
-            switch (progress)
-            {
-                case 1:
-                    return "Not Started";
-                case 2:
-                    return "In Progress";
-                case 3:
-                    return "Completed";
-                default:
-                    return "";
-            }
         }
 
         // Create a Progress SelectList from ProgressEnum
