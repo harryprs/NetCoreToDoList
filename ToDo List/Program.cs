@@ -9,6 +9,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using ToDo_List.Helpers;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
+using Azure.Extensions.AspNetCore.Configuration.Secrets;
 
 namespace ToDo_List
 {
@@ -21,14 +24,14 @@ namespace ToDo_List
             // Configurations are stored as a Json in appsettings.json
             var configuration = builder.Configuration;
 
-            // Start of Authentication
-            // Don't seem to use any of this
-            /*var identityUrl = configuration.GetValue<string>("IdentityUrl");
-            var callBackUrl = configuration.GetValue<string>("CallBackUrl");
-            var sessionCookieLifetime = configuration.GetValue("SessionCookieLifetimeMinutes", 60);*/
-
-            //DB context - can create a AppDbContext class and call instead
-            var cs = builder.Environment.IsDevelopment() ? configuration.GetConnectionString("DevSqlConnection") : configuration.GetConnectionString("defaultConnection");
+            // If not development environment, use the keyvault. Else, use development settings.
+            if (!builder.Environment.IsDevelopment())
+            {
+                var keyVaultUrl = configuration.GetSection("KEYVALUE_ENDPOINT").Value!;
+                var secretClient = new SecretClient(new(keyVaultUrl), new DefaultAzureCredential());
+                configuration.AddAzureKeyVault(secretClient, new KeyVaultSecretManager());
+            }
+            var cs = configuration.GetSection("ConnectionStrings:defaultConnection").Value;
             builder.Services.AddDbContext<ToDoDbContext>(options =>
             {
                 options.UseSqlServer(cs);
@@ -55,7 +58,7 @@ namespace ToDo_List
             //END OF ROLE BASED AUTH
 
             // Add Auth Services
-            // START OF JWT AUTHENTICATION - WIP
+            // START OF JWT AUTHENTICATION - EXPERIMENTAL
             // https://www.youtube.com/watch?v=YmxtJ5euiSo&ab_channel=CsharpSpace
             // Set up authentication options
             /*services.AddAuthentication(options => {
@@ -124,8 +127,6 @@ namespace ToDo_List
             // END OF USING JWT AUTHENTICATION IN COOKIE TEST
             //services.AddIdentity<IdentityUser, IdentityRole>();
 
-            // END OF JWT AUTHENTICATION
-
             // START OF EXTERNAL AUTHENTICATION SERVICES
             /*services.AddAuthentication(options =>
             {
@@ -156,9 +157,10 @@ namespace ToDo_List
             {
                 microsoftOptions.ClientId = builder.Configuration["Authentication:Microsoft:ClientId"];
                 microsoftOptions.ClientSecret = builder.Configuration["Authentication:Microsoft:ClientId"];
-            });*/
+            });
+            builder.Services.AddAuthorization();*/
+
             // END OF EXTERNAL AUTHENTICATION SERVICES
-            //builder.Services.AddAuthorization();
 
             var app = builder.Build();
 
