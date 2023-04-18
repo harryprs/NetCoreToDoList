@@ -34,7 +34,7 @@ namespace ToDo_List
                 // Extra escape characters appear
                 options.UseSqlServer(cs.Value.Replace("\\\\","\\"));
             });
-            
+            Console.WriteLine(cs.Value.Replace("\\\\","\\"));
             // START OF ROLE BASED AUTH
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                             .AddCookie(options =>
