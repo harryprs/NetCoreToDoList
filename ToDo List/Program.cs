@@ -28,13 +28,13 @@ namespace ToDo_List
             var secretClient = new SecretClient(new(keyVaultUrl), new DefaultAzureCredential());
             configuration.AddAzureKeyVault(secretClient, new KeyVaultSecretManager());
             KeyVaultSecret cs = secretClient.GetSecret("ConnectionStrings-defaultConnection");
-
+            Console.WriteLine(cs.Value.Replace("\\\\", "\\"));
             builder.Services.AddDbContext<ToDoDbContext>(options =>
             {
                 // Extra escape characters appear
                 options.UseSqlServer(cs.Value.Replace("\\\\","\\"));
             });
-            Console.WriteLine(cs.Value.Replace("\\\\","\\"));
+            
             // START OF ROLE BASED AUTH
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                             .AddCookie(options =>
