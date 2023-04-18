@@ -24,19 +24,19 @@ namespace ToDo_List
             // Configurations are stored as a Json in appsettings.json
             var configuration = builder.Configuration;
 
-            // If not development environment, use the keyvault. Else, use development settings.
-            if (!builder.Environment.IsDevelopment())
-            {
-                var keyVaultUrl = configuration.GetSection("KEYVALUE_ENDPOINT").Value!;
-                var secretClient = new SecretClient(new(keyVaultUrl), new DefaultAzureCredential());
-                configuration.AddAzureKeyVault(secretClient, new KeyVaultSecretManager());
-            }
-            var cs = configuration.GetSection("ConnectionStrings:defaultConnection").Value;
+            var keyVaultUrl = builder.Environment.IsDevelopment() ? configuration.GetSection("ConnectionStrings:KEYVALUE_ENDPOINT_DEV").Value! : 
+                                                                    configuration.GetSection("ConnectionStrings:KEYVALUE_ENDPOINT").Value!;
+            var secretClient = new SecretClient(new(keyVaultUrl), new DefaultAzureCredential());
+            configuration.AddAzureKeyVault(secretClient, new KeyVaultSecretManager());
+
+            KeyVaultSecret cs = secretClient.GetSecret("ConnectionStrings-defaultConnection");
+
             builder.Services.AddDbContext<ToDoDbContext>(options =>
             {
-                options.UseSqlServer(cs);
+                // Extra escape characters appear
+                options.UseSqlServer(cs.Value.Replace("\\\\", "\\"));
             });
-
+            
             // START OF ROLE BASED AUTH
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                             .AddCookie(options =>
