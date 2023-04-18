@@ -24,11 +24,10 @@ namespace ToDo_List
             // Configurations are stored as a Json in appsettings.json
             var configuration = builder.Configuration;
 
-            var keyVaultUrl = builder.Environment.IsDevelopment() ? configuration.GetSection("ConnectionStrings:KEYVALUE_ENDPOINT_DEV").Value! : 
+            var keyVaultUrl = builder.Environment.IsDevelopment() ? configuration.GetSection("ConnectionStrings:KEYVALUE_ENDPOINT").Value! : 
                                                                     configuration.GetSection("ConnectionStrings:KEYVALUE_ENDPOINT").Value!;
             // For deployment we need to provide an identity with relevant access policies in the key vault. Policies are added via the azure portal.
             // https://learn.microsoft.com/en-us/dotnet/azure/sdk/authentication?tabs=command-line
-            var managedCredentials = new ManagedIdentityCredential();
             var secretClient = new SecretClient(new(keyVaultUrl), new DefaultAzureCredential());
             configuration.AddAzureKeyVault(secretClient, new KeyVaultSecretManager());
 
