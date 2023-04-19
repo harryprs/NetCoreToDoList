@@ -12,6 +12,8 @@ namespace ToDo_List.Helpers
         public DbSet<UserLogin> User { get; set; }
         IWebHostEnvironment HostEnv { get; }
 
+        public ToDoDbContext() { }
+
         public ToDoDbContext(DbContextOptions<ToDoDbContext> options,
                                IWebHostEnvironment env) : base(options)
         {

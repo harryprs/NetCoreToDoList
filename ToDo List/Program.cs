@@ -21,21 +21,15 @@ namespace ToDo_List
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddControllersWithViews();
-            // Configurations are stored as a Json in appsettings.json
             var configuration = builder.Configuration;
 
-            var keyVaultUrl = builder.Environment.IsDevelopment() ? configuration.GetSection("ConnectionStrings:KEYVALUE_ENDPOINT").Value! : 
-                                                                    configuration.GetSection("ConnectionStrings:KEYVALUE_ENDPOINT").Value!;
-            // For deployment we need to provide an identity with relevant access policies in the key vault. Policies are added via the azure portal.
-            // https://learn.microsoft.com/en-us/dotnet/azure/sdk/authentication?tabs=command-line
-            var secretClient = new SecretClient(new(keyVaultUrl), new DefaultAzureCredential());
+            var cs = configuration.GetSection("ConnectionStrings:defaultConnection").Value!;
             configuration.AddAzureKeyVault(secretClient, new KeyVaultSecretManager());
 
-            KeyVaultSecret cs = secretClient.GetSecret("ConnectionStrings-defaultConnection");
             builder.Services.AddDbContext<ToDoDbContext>(options =>
             {
                 // Extra escape characters appear
-                options.UseSqlServer(cs.Value.Replace("\\\\", "\\"));
+                options.UseSqlServer(cs);
             });
             
             // START OF ROLE BASED AUTH
