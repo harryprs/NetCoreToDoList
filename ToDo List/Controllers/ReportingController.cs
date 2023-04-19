@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -34,23 +35,35 @@ namespace ToDo_List.Controllers
             var userId = GetUserIdFromClaims();
             var toDoLists = await toDoRepo.GetAllToDoListsByUserId(userId);
 
-            var dailyCompletedCount = new Dictionary<double, double>();
+            var totalListsCompleted = toDoLists.Where(l => l.IsFinished).Count();
+            
+            var listItems = toDoLists.SelectMany(l => l.ListItems).ToList();
+            int totalTimeSpent = 0;
+            int? totalEstimatedTime = 0;
+            foreach (var item in listItems)
+            {
+                totalTimeSpent += item.TimeSpent;
+                if (totalEstimatedTime != null)
+                {
+                    totalEstimatedTime += item.EstimatedTime;
+                }
+            }
 
+            var dailyCompletedCount = new Dictionary<double, double>();
             foreach(var item in toDoLists)
             {
                 if (item.IsFinished)
                 {
                     // Convert DateTime to Javascript timestamp, ignore time
-                    var day = item.DateTimeListFinished.Value.Date.ToUniversalTime().Subtract(
+                    var date = item.DateTimeListFinished.Value.Date.ToUniversalTime().Subtract(
                         new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
-
-                    if (!dailyCompletedCount.ContainsKey(day))
+                    if (!dailyCompletedCount.ContainsKey(date))
                     {
-                        dailyCompletedCount[day] = 1;
+                        dailyCompletedCount[date] = 1;
                     }
                     else
                     {
-                        dailyCompletedCount[day] += 1;
+                        dailyCompletedCount[date] += 1;
                     }
                 }
             }
@@ -62,6 +75,9 @@ namespace ToDo_List.Controllers
             }
 
             ViewBag.DataPoints = JsonConvert.SerializeObject(dataPoints);
+            ViewBag.TotalListsCompleted = totalListsCompleted;
+            ViewBag.TotalTimeSpent = totalTimeSpent;
+            ViewBag.TotalEstimatedTime = totalEstimatedTime;
 
             return View();
         }
