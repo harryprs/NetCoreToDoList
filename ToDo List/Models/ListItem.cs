@@ -22,6 +22,7 @@ namespace ToDo_List.Models
         public int? EstimatedTime { get; set; }
         [Display(Name = "Time Spent(mins)")]
         public int TimeSpent { get; set; }
+        public DateTime? DateTimeItemFinished { get; set; }
         //Navigation Properties
         public int ToDoListId { get; set; }
         public ToDoList ToDoList { get; set; }

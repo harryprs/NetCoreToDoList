@@ -356,6 +356,7 @@ namespace ToDo_List.Controllers
             if(toDoList != null && userId == toDoList.UserId)
             {
                 toDoList.IsFinished = !toDoList.IsFinished;
+                toDoList.DateTimeListFinished = DateTime.UtcNow;
                 await toDoRepo.UpdateList(toDoList);
             }
 
@@ -375,6 +376,13 @@ namespace ToDo_List.Controllers
                 return;
             }
             itemToUpdate.Progress = (ProgressEnum)progress;
+            if(progress == 3)
+            {
+                itemToUpdate.DateTimeItemFinished = DateTime.UtcNow;
+            } else
+            {
+                itemToUpdate.DateTimeItemFinished = null;
+            }
             await toDoRepo.UpdateListItem(itemToUpdate);
         }
 

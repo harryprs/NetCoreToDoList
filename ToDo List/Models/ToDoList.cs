@@ -10,6 +10,7 @@ namespace ToDo_List.Models
         [StringLength(30)]
         public string Title { get; set; }
         public bool IsFinished { get; set; }
+        public DateTime? DateTimeListFinished { get; set; }
         public IList<ListItem> ListItems { get; set; }
         public int UserId { get; set; }
         public UserLogin User { get; set; }

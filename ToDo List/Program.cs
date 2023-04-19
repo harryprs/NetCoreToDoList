@@ -24,11 +24,9 @@ namespace ToDo_List
             var configuration = builder.Configuration;
 
             var cs = configuration.GetSection("ConnectionStrings:defaultConnection").Value!;
-            configuration.AddAzureKeyVault(secretClient, new KeyVaultSecretManager());
 
             builder.Services.AddDbContext<ToDoDbContext>(options =>
             {
-                // Extra escape characters appear
                 options.UseSqlServer(cs);
             });
             
