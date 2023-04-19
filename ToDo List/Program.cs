@@ -23,16 +23,12 @@ namespace ToDo_List
             builder.Services.AddControllersWithViews();
             var configuration = builder.Configuration;
 
-            var keyVaultUrl = builder.Environment.IsDevelopment() ? configuration.GetSection("ConnectionStrings:KEYVALUE_ENDPOINT_DEV").Value! : 
-                                                                    configuration.GetSection("ConnectionStrings:KEYVALUE_ENDPOINT").Value!;
-            var secretClient = new SecretClient(new(keyVaultUrl), new DefaultAzureCredential());
-            configuration.AddAzureKeyVault(secretClient, new KeyVaultSecretManager());
-            KeyVaultSecret cs = secretClient.GetSecret("ConnectionStrings-defaultConnection");
-            Console.WriteLine(cs.Value.Replace("\\\\", "\\"));
+            var cs = configuration.GetSection("ConnectionStrings:defaultConnection").Value!;
+
             builder.Services.AddDbContext<ToDoDbContext>(options =>
             {
                 // Extra escape characters appear
-                options.UseSqlServer(cs.Value.Replace("\\\\","\\"));
+                options.UseSqlServer(cs);
             });
             
             // START OF ROLE BASED AUTH
