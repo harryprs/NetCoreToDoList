@@ -68,3 +68,20 @@ body {
     overflow: hidden;
     vertical-align: top;
 }
+
+.square-container {
+    height: 100px;
+    width: 100px;
+    border: 1px solid black;
+    display: inline-block;
+}
+
+.reporting-box-header {
+    text-align: center;
+    font-size: 14px;
+}
+
+.reporting-box-content {
+    text-align: center;
+    font-size: 40px;
+}

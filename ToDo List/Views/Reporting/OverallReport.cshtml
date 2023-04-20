@@ -12,12 +12,32 @@
 
 <div id="listItemsCompletedChart" style="height: 300px; width: 100%;"></div>
 
-<div>Total Lists Completed: @Model.TotalListsCompleted</div>
-<div>Total Time Spent: @Model.TotalTimeSpent</div>
-<div>Total Esimated Time: @Model.TotalEstimatedTime</div>
-<div>Total List Items Not Started: @Model.ListItemsNotStartedCount</div>
-<div>Total List Items In Progress: @Model.ListItemsInProgressCount</div>
-<div>Total List Items Completed: @Model.ListItemsCompletedCount</div>
+<div style="display: flex; justify-content: space-between;">
+    <div class="square-container">
+        <div class="reporting-box-header">Total Lists Completed</div>
+        <div class="reporting-box-content">@Model.TotalListsCompleted</div>
+    </div>
+    <div class="square-container">
+        <div class="reporting-box-header">Total Time Spent (mins)</div>
+        <div class="reporting-box-content">@Model.TotalTimeSpent</div>
+    </div>
+    <div class="square-container">
+        <div class="reporting-box-header">Total Estimated Time (mins)</div>
+        <div class="reporting-box-content">@Model.TotalEstimatedTime</div>
+    </div>
+    <div class="square-container">
+        <div class="reporting-box-header">Total List Items Not Started</div>
+        <div class="reporting-box-content">@Model.ListItemsNotStartedCount</div>
+    </div>
+    <div class="square-container">
+        <div class="reporting-box-header">Total List Items In Progress</div>
+        <div class="reporting-box-content">@Model.ListItemsInProgressCount</div>
+    </div>
+    <div class="square-container">
+        <div class="reporting-box-header">Total List Items Completed</div>
+        <div class="reporting-box-content">@Model.ListItemsCompletedCount</div>
+    </div>
+</div>
 
 <script type="text/javascript">
     window.onload = function () {
@@ -32,11 +52,12 @@
             ],
             axisX: {
                 title: "Date",
-                interal: 1,
+                interval: 1,
                 intervalType: "day"
             },
             axisY: {
-                title: "Count"
+                title: "Count",
+                interval: 1
             },
             data: [
             {
@@ -58,11 +79,12 @@
             ],
             axisX: {
                 title: "Date",
-                interal: 1,
+                interval: 1,
                 intervalType: "day"
             },
             axisY: {
-                title: "Count"
+                title: "Count",
+                interval: 1
             },
             data: [
             {
