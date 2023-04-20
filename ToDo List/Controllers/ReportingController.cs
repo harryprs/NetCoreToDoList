@@ -38,7 +38,7 @@ namespace ToDo_List.Controllers
             foreach(var item in listItems)
             {
                 totalTimeSpent += item.TimeSpent;
-                if (totalEstimatedTime != null)
+                if (item.EstimatedTime != null)
                 {
                     totalEstimatedTime += item.EstimatedTime;
                 }
