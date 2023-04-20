@@ -36,7 +36,7 @@ namespace ToDo_List.Controllers
         public async Task<ActionResult<UserLogin>> Register(UserDto request)
         {
             var existingUser = await _context.User.Where(x => x.Username == request.Username).FirstOrDefaultAsync();
-            // User with that username already exists
+            
             if(existingUser != null)
             {
                 return View(request);
