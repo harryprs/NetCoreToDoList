@@ -69,6 +69,11 @@ body {
     vertical-align: top;
 }
 
+.reporting-boxes-container {
+    display: flex;
+    justify-content: space-between;
+}
+
 .square-container {
     height: 100px;
     width: 100px;
