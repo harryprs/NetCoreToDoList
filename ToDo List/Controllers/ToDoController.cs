@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using NuGet.Protocol.Plugins;
 using ToDo_List.Data;
 using ToDo_List.Helpers;
 using ToDo_List.Models;
@@ -33,11 +27,11 @@ namespace ToDo_List.Controllers
         [HttpGet]
         public async Task<ActionResult> Index()
         {
-            // Jwt Auth stuff
-            // Our jwt and refresh tokens are being stored in context.request.Headers, for example:
+            /* Jwt Auth stuff - WIP
+               Our jwt and refresh tokens are being stored in context.request.Headers, for example:
             // jwtToken = this.context.request.Headers["jwt"]
             // refreshToken = this.context.request.Headers["refreshToken"]
-            // We need to pull that token, read it and grab the claims. This will happen before routing - is it a setting in Program.cs?
+            // We need to pull that token, read it and grab the claims.*/
             var userId = GetUserIdFromClaims();
             if (userId == 0)
             {

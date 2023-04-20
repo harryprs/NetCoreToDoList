@@ -4,15 +4,7 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using ToDo_List.Models;
-using Google.Apis.PeopleService;
-using Google.Apis.Auth.OAuth2;
-using Microsoft.AspNetCore.DataProtection;
-using static System.Net.WebRequestMethods;
-using Newtonsoft.Json;
-using System.Net;
 using Microsoft.CodeAnalysis;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
 using ToDo_List.Helpers;
 
 namespace ToDo_List.Controllers
@@ -75,7 +67,7 @@ namespace ToDo_List.Controllers
         {
             var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-            // Quert result, and re-package it
+            // Query result, and re-package it
             var claims = result.Principal.Identities
                 .FirstOrDefault().Claims.Select(claim => new
                 {

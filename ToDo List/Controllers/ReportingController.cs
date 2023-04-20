@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
+﻿using System.Data;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using ToDo_List.Data;
 using ToDo_List.Helpers;
 using ToDo_List.Models;
 using ToDo_List.Services;
@@ -82,7 +74,7 @@ namespace ToDo_List.Controllers
                     }
                 }
             }
-
+            
             List<DataPoint> listsDataPoints = new List<DataPoint>();
             foreach(var dictItem in dailyCompletedListCount)
             {

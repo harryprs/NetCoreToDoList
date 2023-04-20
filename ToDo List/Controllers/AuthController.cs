@@ -2,13 +2,8 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using NuGet.Common;
-using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using System.Text;
 using ToDo_List.Data;
 using ToDo_List.Helpers;
 
@@ -76,10 +71,49 @@ namespace ToDo_List.Controllers
         [HttpPost]
         public async Task<ActionResult<string>> Login(UserDto request)
         {
-            // provide with dummy data to test
-            /*request.Username = "harryprs";
-            request.Password = "admin123";*/
-            /*
+            var dbUser = await _context.User.Where(u => u.Username == request.Username).FirstOrDefaultAsync();
+            if (dbUser == null || dbUser.Username != request.Username)
+            {
+                ModelState.AddModelError(nameof(request.Username), "Username or Password is wrong");
+                return View();
+            }
+
+            if (!VerifyPasswordHash(request.Password, dbUser.PasswordHash, dbUser.PasswordSalt))
+            {
+                ModelState.AddModelError(nameof(request.Username), "Username or Password is wrong");
+                return View();
+            }
+
+            List<Claim> claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, dbUser.Id.ToString()),
+                new Claim(ClaimTypes.Name, dbUser.Username),
+                new Claim(ClaimTypes.Role, "User")
+            };
+            ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            AuthenticationProperties properties = new AuthenticationProperties()
+            {
+                AllowRefresh = true,
+                IsPersistent = true,//KeepLoggedIn
+            };
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, 
+                new ClaimsPrincipal(claimsIdentity), properties);
+
+            return RedirectToAction("Index", "ToDo");
+        }
+
+        public async Task<IActionResult> LogOut()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Index", "Home");
+        }
+
+        // Refresh tokens are used to acquire new access tokens from the authentication component - refresh tokens have a much longer lifetime
+        /* Functions used for JWT Auth - WIP
+        // POST: Auth/Login
+        [HttpPost]
+        public async Task<ActionResult<string>> Login(UserDto request)
+        { 
             var dbUser = await _context.User.Where(u => u.Username == request.Username).FirstOrDefaultAsync();
             if (dbUser.Username != request.Username)
             {
@@ -118,47 +152,8 @@ namespace ToDo_List.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index", "ToDo");
             }
-            */
-            var dbUser = await _context.User.Where(u => u.Username == request.Username).FirstOrDefaultAsync();
-            if (dbUser == null || dbUser.Username != request.Username)
-            {
-                ModelState.AddModelError(nameof(request.Username), "Username or Password is wrong");
-                return View();
-            }
-
-            if (!VerifyPasswordHash(request.Password, dbUser.PasswordHash, dbUser.PasswordSalt))
-            {
-                ModelState.AddModelError(nameof(request.Username), "Username or Password is wrong");
-                return View();
-            }
-
-            List<Claim> claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, dbUser.Id.ToString()),
-                new Claim(ClaimTypes.Name, dbUser.Username),
-                new Claim(ClaimTypes.Role, "User")// Is this claim stored in our db?
-            };
-            ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            AuthenticationProperties properties = new AuthenticationProperties()
-            {
-                AllowRefresh = true,
-                IsPersistent = true,//KeepLoggedIn
-            };
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, 
-                new ClaimsPrincipal(claimsIdentity), properties);
-            //await HttpContext.SignInAsync(new ClaimsPrincipal(new ClaimsIdentity(claims, "Cookies", "user", "role")));
-
-            return RedirectToAction("Index", "ToDo");
         }
 
-        public async Task<IActionResult> LogOut()
-        {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Index", "Home");
-        }
-
-        // Refresh tokens are used to acquire new access tokens from the authentication component - refresh tokens have a much longer lifetime
-        /* Functions used for JWT Auth
         HttpPost("refresh-token")]
         public async Task<ActionResult<string>> RefreshToken(UserLogin user)
         {
@@ -186,7 +181,6 @@ namespace ToDo_List.Controllers
             return Ok(token);
         }
         
-
         private RefreshToken GenerateRefreshToken()
         {
             var refreshToken = new RefreshToken
@@ -256,7 +250,6 @@ namespace ToDo_List.Controllers
 
         private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
         {
-            // checks the passwordSalt, then tri
             using (var hmac = new HMACSHA512(passwordSalt))
             {
                 var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
