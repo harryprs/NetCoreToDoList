@@ -8,10 +8,6 @@
 </head>
 <h1>Reports</h1>
 
-<div id="listCompletedChart" style="height: 300px; width: 100%;"></div>
-
-<div id="listItemsCompletedChart" style="height: 300px; width: 100%;"></div>
-
 <div class="reporting-boxes-container">
     <div class="square-container">
         <div class="reporting-box-header">Total Lists Completed</div>
@@ -26,6 +22,16 @@
         <div class="reporting-box-content">@Model.TotalEstimatedTime</div>
     </div>
     <div class="square-container">
+        <div class="reporting-box-header">Total Time Spent: Completed Tasks (mins)</div>
+        <div class="reporting-box-content">@Model.ListItemsCompletedTimeSpent</div>
+    </div>
+    <div class="square-container">
+        <div class="reporting-box-header">Total Estimated Time: Completed Tasks (mins)</div>
+        <div class="reporting-box-content">@Model.ListItemsCompletedEstimatedTime</div>
+    </div>
+</div>
+<div class="reporting-boxes-container">
+    <div class="square-container">
         <div class="reporting-box-header">Total List Items Not Started</div>
         <div class="reporting-box-content">@Model.ListItemsNotStartedCount</div>
     </div>
@@ -38,6 +44,10 @@
         <div class="reporting-box-content">@Model.ListItemsCompletedCount</div>
     </div>
 </div>
+
+<div id="listCompletedChart" style="height: 300px; width: 100%;"></div>
+
+<div id="listItemsCompletedChart" style="height: 300px; width: 100%;"></div>
 
 <script type="text/javascript">
     window.onload = function () {

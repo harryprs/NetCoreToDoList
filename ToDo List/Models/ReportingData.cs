@@ -10,5 +10,7 @@
         public int ListItemsNotStartedCount { get; set; }
         public int ListItemsInProgressCount { get; set; }
         public int ListItemsCompletedCount { get; set; }
+        public int ListItemsCompletedTimeSpent { get; set; }
+        public int? ListItemsCompletedEstimatedTime { get; set; }
     }
 }

@@ -71,19 +71,22 @@ body {
 
 .reporting-boxes-container {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
+    margin-bottom: 10px;
 }
 
 .square-container {
-    height: 100px;
-    width: 100px;
+    height: 110px;
+    width: 110px;
     border: 1px solid black;
     display: inline-block;
+    margin: 0px 2px 0px 2px;
 }
 
 .reporting-box-header {
     text-align: center;
-    font-size: 14px;
+    font-size: 13px;
+    height: 40%;
 }
 
 .reporting-box-content {

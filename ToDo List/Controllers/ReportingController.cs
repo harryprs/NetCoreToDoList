@@ -35,7 +35,9 @@ namespace ToDo_List.Controllers
             int listItemsCompletedCount = 0;
             int listItemsInProgressCount = 0;
             int listItemsNotStartedCount = 0;
-            foreach(var item in listItems)
+            int listItemsCompletedTimeSpent = 0;
+            int? listItemsCompletedEstimatedTime = 0;
+            foreach (var item in listItems)
             {
                 totalTimeSpent += item.TimeSpent;
                 if (item.EstimatedTime != null)
@@ -52,6 +54,8 @@ namespace ToDo_List.Controllers
                         break;
                     case 3:
                         listItemsCompletedCount++;
+                        listItemsCompletedTimeSpent += item.TimeSpent;
+                        listItemsCompletedEstimatedTime += item.EstimatedTime;
                         break;
                 }
             }
@@ -115,7 +119,9 @@ namespace ToDo_List.Controllers
                 TotalEstimatedTime = totalEstimatedTime,
                 ListItemsCompletedCount = listItemsCompletedCount,
                 ListItemsInProgressCount = listItemsInProgressCount,
-                ListItemsNotStartedCount = listItemsNotStartedCount
+                ListItemsNotStartedCount = listItemsNotStartedCount,
+                ListItemsCompletedTimeSpent = listItemsCompletedTimeSpent,
+                ListItemsCompletedEstimatedTime = listItemsCompletedEstimatedTime
             };
 
             return View(reportingData);
