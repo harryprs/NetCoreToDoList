@@ -30,10 +30,12 @@ namespace ToDo_List.Controllers
         [HttpPost]
         public async Task<ActionResult<UserLogin>> Register(UserDto request)
         {
+            request.Username = request.Username.ToLower();
             var existingUser = await _context.User.Where(x => x.Username == request.Username).FirstOrDefaultAsync();
             
             if(existingUser != null)
             {
+                ModelState.AddModelError(nameof(request.Username), "A user with this name already already exists.");
                 return View(request);
             }
 
@@ -71,6 +73,7 @@ namespace ToDo_List.Controllers
         [HttpPost]
         public async Task<ActionResult<string>> Login(UserDto request)
         {
+            request.Username = request.Username.ToLower();
             var dbUser = await _context.User.Where(u => u.Username == request.Username).FirstOrDefaultAsync();
             if (dbUser == null || dbUser.Username != request.Username)
             {
