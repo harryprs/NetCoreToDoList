@@ -43,24 +43,6 @@ namespace ToDo_List.Controllers
             return View(toDoLists);
         }
 
-        // GET: ToDo/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null || _context.ToDoList == null)
-            {
-                return NotFound();
-            }
-
-            var toDoList = await _context.ToDoList
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (toDoList == null)
-            {
-                return NotFound();
-            }
-
-            return View(toDoList);
-        }
-
         // GET: ToDo/Create
         public IActionResult Create()
         {
@@ -156,7 +138,7 @@ namespace ToDo_List.Controllers
         // POST: ToDo/EditListItem/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditListItem(int id, [Bind("Id,ItemName,ItemDescription,Progress,EstimatedTime,TimeSpent,Priority,ToDoListId")] ListItem listItem)
+        public async Task<IActionResult> EditListItem(int id, [Bind("Id,ItemName,ItemDescription,Progress,EstimatedTime,TimeSpent,Priority,ToDoListId,DateTimeItemFinished")] ListItem listItem)
         {
             if (!await ValidateUserOwnsToDoList(listItem.ToDoListId))
             {
