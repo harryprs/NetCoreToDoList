@@ -128,61 +128,6 @@ namespace ToDo_List.Controllers
             return View(listItem);
         }
 
-        // GET: ToDo/Edit/5
-        public async Task<IActionResult> Edit(int id)
-        {
-            if (id == 0 || _context.ToDoList == null)
-            {
-                return NotFound();
-            }
-
-            var toDoList = await toDoRepo.GetToDoListByToDoListId(id);
-            int userId = GetUserIdFromClaims();
-            if (userId == 0 || toDoList.UserId != userId)
-            {
-                return NotFound();
-            }
-
-            return View(toDoList);
-        }
-
-        // POST: ToDo/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title")] ToDoList toDoList)
-        {
-            if (!await ValidateUserOwnsToDoList(id))
-            {
-                return NotFound();
-            }
-
-            if (id != toDoList.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    await toDoRepo.UpdateList(toDoList);
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ToDoListExists(toDoList.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(toDoList);
-        }
-
         // GET: ToDo/EditListItem/5
         public async Task<IActionResult> EditListItem(int? id)
         {
