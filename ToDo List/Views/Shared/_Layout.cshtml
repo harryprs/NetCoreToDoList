@@ -30,9 +30,12 @@
                         </li>
                     </ul>
                 </div>
-                <div>
-                    <a asp-action="Logout" asp-controller="Auth">Logout</a>
-                </div>
+                @if (User.IsInRole("User"))
+                {
+                    <div>
+                        <a asp-action="Logout" asp-controller="Auth">Logout</a>
+                    </div>
+                }
             </div>
         </nav>
     </header>

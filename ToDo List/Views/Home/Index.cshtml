@@ -1,11 +1,19 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
+@using Microsoft.AspNetCore.Authorization
 
 <div class="text-center">
     <h1 class="display-4">Harryprs ToDo</h1>
 </div>
 <div class="text-center">
-    <p><a asp-area="" asp-controller="Auth" asp-action="Register">Register</a></p>
-    <p><a asp-area="" asp-controller="Auth" asp-action="Login">Login</a></p>
+    @if (User.IsInRole("User"))
+    {
+        <p><a asp-action="Logout" asp-controller="Auth">Logout</a></p>
+    }
+    else
+    {
+        <p><a asp-area="" asp-controller="Auth" asp-action="Register">Register</a></p>
+        <p><a asp-area="" asp-controller="Auth" asp-action="Login">Login</a></p>
+    }
 </div>
